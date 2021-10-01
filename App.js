@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { createStore, combineReducers } from 'redux'
+import { createStore, combineReducers, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux';
 import productsReducer from './store/reducers/products';
 import ShopNavigator from './navigation/ShopNavigator'
 import AppLoading from 'expo-app-loading'
 import * as Font from 'expo-font'
+import ReduxThunk from 'redux-thunk'
 // import {composeWithDevTools} from 'redux-devtools-extension'
 import cartReducer from './store/reducers/cart'
 import Toast from 'react-native-toast-message';
@@ -17,7 +18,7 @@ const rootReducer = combineReducers({
   orders: orderReducer
 })
 
-const store = createStore(rootReducer)
+const store = createStore(rootReducer, applyMiddleware(ReduxThunk))
 
 const fetchFonts = () => {
   return Font.loadAsync({

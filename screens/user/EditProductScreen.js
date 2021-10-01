@@ -1,9 +1,20 @@
 import React, {useEffect, useState, useReducer, useCallback} from 'react'
-import { Alert, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { 
+    Alert, 
+    KeyboardAvoidingView, 
+    ScrollView, 
+    StyleSheet, 
+    Text, 
+    TextInput, 
+    View,
+    ActivityIndicator,
+    Button
+} from 'react-native'
 import { HeaderButtons, Item } from 'react-navigation-header-buttons'
 import { useSelector, useDispatch } from 'react-redux'
 import CustomHeaderButton from '../../components/UI/HeaderButton'
 import Input from '../../components/UI/input'
+import Colors from '../../constants/Colors'
 import { createProduct, updateProduct } from '../../store/actions/products'
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE'
@@ -34,6 +45,9 @@ const formReducer = (state, action) => {
 
 const EditProductsScreen = (props) => {
 
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState()
+
     const productId = props.navigation.getParam('productId')
 
     const dispatch = useDispatch()
@@ -58,7 +72,7 @@ const EditProductsScreen = (props) => {
         formIsValid: userProduct ? true : false
     })
 
-    const submitHandler = () => {
+    const submitHandler = async () => {
         if(!formState.formIsValid) {
             Alert.alert("Wrong input!", "Please check the errors in the form", [
                 {
@@ -67,20 +81,36 @@ const EditProductsScreen = (props) => {
             ])
             return 
         }
+        setError(null)
+        setIsLoading(true)
         const {title, description, imageUrl, price} = formState.inputValues
-        if(userProduct) {
-            dispatch(updateProduct(productId, title, description, imageUrl))
-        } else {
-            dispatch(createProduct(title, description, imageUrl, +price))
+        try{
+            if(userProduct) {
+                await dispatch(updateProduct(productId, title, description, imageUrl))
+            } else {
+                await dispatch(createProduct(title, description, imageUrl, +price))
+            }
+            props.navigation.goBack()
+        } catch(err) {
+            setError(err.message)
         }
-        props.navigation.goBack()
+        
+        setIsLoading(false)
+        
     }
 
     useEffect(() => {
+        console.log("adsdsdsd")
         props.navigation.setParams({
             submitHandler
         })
     }, [formState])
+
+    useEffect(() => {
+        if(error) {
+            Alert.alert("An error occurred", error)
+        }
+    }, [error])
 
     const inputChangeHandler = useCallback((inputIdentifier, inputValue, inputValidity) => {
         dispatchFormState({
@@ -90,6 +120,23 @@ const EditProductsScreen = (props) => {
             input: inputIdentifier
         })
     }, [dispatchFormState])
+
+    // if(error) {
+    //     return (<View style={styles.centered}>
+    //         <Text>{error}</Text>
+    //         <Button title="Try again" color={Colors.primary} onPress={() => {
+    //             submitHandler()
+    //         }} />  
+    //     </View>)
+    // }
+
+    if(isLoading) {
+        return (
+            <View style={styles.centered}>
+                <ActivityIndicator size="large" color={Colors.primary} />
+            </View>
+        )
+    }
 
     return (
         <KeyboardAvoidingView 
@@ -182,6 +229,11 @@ EditProductsScreen.navigationOptions = navData => {
 const styles = StyleSheet.create({
     form: {
         margin: 20
+    },
+    centered: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })
 
