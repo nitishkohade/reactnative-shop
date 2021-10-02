@@ -11,11 +11,13 @@ import ReduxThunk from 'redux-thunk'
 import cartReducer from './store/reducers/cart'
 import Toast from 'react-native-toast-message';
 import orderReducer from './store/reducers/order'
+import AuthReducer from './store/reducers/auth'
 
 const rootReducer = combineReducers({
   products: productsReducer,
   cart: cartReducer,
-  orders: orderReducer
+  orders: orderReducer,
+  auth: AuthReducer
 })
 
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk))

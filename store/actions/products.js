@@ -6,9 +6,10 @@ export const UPDATE_PRODUCT = "UPDATE_PRODUCT"
 export const SET_PRODUCTS = "SET_PRODUCTS"
 
 export const fetchProducts = () => {
-    return async (dispatch) => {
+    return async (dispatch, getState) => {
 
         try{
+            const userId = getState().auth.userId
             const response = await fetch("https://react-native-shop-87fbb-default-rtdb.firebaseio.com/products.json")
 
             if(!response.ok) {
@@ -20,11 +21,15 @@ export const fetchProducts = () => {
             const loadedProducts = []
 
             for(const key in resData) {
-                const {title, imageUrl, description, price} = resData[key]
-                loadedProducts.push(new Product(key, 'u1', title, imageUrl, description, price))
+                const {title, imageUrl, description, price, ownerId} = resData[key]
+                loadedProducts.push(new Product(key, ownerId, title, imageUrl, description, price))
             }
 
-            dispatch({type: SET_PRODUCTS, products: loadedProducts})
+            dispatch({
+                type: SET_PRODUCTS, 
+                products: loadedProducts, 
+                userProducts: loadedProducts.filter(prod => prod.ownerId === userId)
+            })
         } catch(err) {
             throw err;
         }
@@ -33,9 +38,10 @@ export const fetchProducts = () => {
 
 export const deleteProduct = productId => {
 
-    return async dispatch => {
+    return async (dispatch, getState) => {
         try{
-            const response = await fetch(`https://react-native-shop-87fbb-default-rtdb.firebaseio.com/products/${productId}.json`, {
+            const token = getState().auth.token
+            const response = await fetch(`https://react-native-shop-87fbb-default-rtdb.firebaseio.com/products/${productId}.json?auth=${token}`, {
                 method: 'DELETE'
             })
 
@@ -56,18 +62,20 @@ export const deleteProduct = productId => {
 }
 
 export const createProduct = (title, description, imageUrl, price) => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        
         try{
-            const response = await fetch("https://react-native-shop-87fbb-default-rtdb.firebaseio.com/products.json", {
+            const token = getState().auth.token
+            const userId = getState().auth.userId
+            const response = await fetch(`https://react-native-shop-87fbb-default-rtdb.firebaseio.com/products.json?auth=${token}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    title, description, imageUrl, price
+                    title, description, imageUrl, price, ownerId: userId
                 })
             })
-
             if(!response.ok) {
                 throw new Error('Something went wrong')
             }
@@ -81,7 +89,8 @@ export const createProduct = (title, description, imageUrl, price) => {
                     title,
                     description,
                     imageUrl,
-                    price
+                    price,
+                    ownerId: userId
                 }
             })
 
@@ -92,10 +101,11 @@ export const createProduct = (title, description, imageUrl, price) => {
 }
 
 export const updateProduct = (id, title, description, imageUrl) => {
-    return async (dispatch) => {
-
+    return async (dispatch, getState) => {
+        
         try{
-            const response = await fetch(`https://react-native-shop-87fbb-default-rtdb.firebaseio.com/products/${id}.json`, {
+            const token = getState().auth.token
+            const response = await fetch(`https://react-native-shop-87fbb-default-rtdb.firebaseio.com/products/${id}.json?auth=${token}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'

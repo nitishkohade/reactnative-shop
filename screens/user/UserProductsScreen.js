@@ -36,6 +36,14 @@ const UserProductsScreen = (props) => {
         ])
     }
 
+    if(userProducts.length === 0 ) {
+        return (
+            <View style={styles.centered}>
+                <Text>No Products Found, maybe start creating some?</Text>
+            </View>
+        )
+    }
+
     return (
         <FlatList 
             data={userProducts}
@@ -92,7 +100,11 @@ UserProductsScreen.navigationOptions = navData => ({
 })
 
 const styles = StyleSheet.create({
-
+    centered: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    }
 })
 
 

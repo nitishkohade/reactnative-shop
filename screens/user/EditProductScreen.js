@@ -100,7 +100,6 @@ const EditProductsScreen = (props) => {
     }
 
     useEffect(() => {
-        console.log("adsdsdsd")
         props.navigation.setParams({
             submitHandler
         })
@@ -141,8 +140,8 @@ const EditProductsScreen = (props) => {
     return (
         <KeyboardAvoidingView 
             style={{flex:1}}
-            behavior={"padding"} 
-            keyboardVerticalOffset={70}>
+            behavior={"height"} 
+            keyboardVerticalOffset={30}>
             <ScrollView>
                 <View style={styles.form}>
                     <Input 
