@@ -25,7 +25,6 @@ const StartupScreen = props => {
 
             const transformedData = JSON.parse(userData)
             const {token, userId, expirationDate} = transformedData
-            console.log(token, userId, expirationDate)
 
             const date = new Date(expirationDate)
 
@@ -34,8 +33,10 @@ const StartupScreen = props => {
                 return
             }
 
+            const expirationTime = date.getTime() - new Date().getTime()
+
             props.navigation.navigate('Shop')
-            dispatch(authenticate(userId, token))
+            dispatch(authenticate(userId, token, expirationTime))
         }
         tryLogin()
 

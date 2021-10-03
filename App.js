@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux';
 import productsReducer from './store/reducers/products';
-import ShopNavigator from './navigation/ShopNavigator'
+import NavigationContainer from './navigation/NavigationContainer'
 import AppLoading from 'expo-app-loading'
 import * as Font from 'expo-font'
 import ReduxThunk from 'redux-thunk'
@@ -45,12 +45,8 @@ export default function App() {
 
   return (
       <Provider store={store}>
-        <ShopNavigator />
+        <NavigationContainer />
         <Toast ref={(ref) => Toast.setRef(ref)} />
       </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  
-});

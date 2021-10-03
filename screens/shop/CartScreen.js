@@ -30,7 +30,6 @@ const CartScreen = () => {
 
     useEffect(() => {
         return () => {
-            console.log("dadsas")
         }
     })
 
